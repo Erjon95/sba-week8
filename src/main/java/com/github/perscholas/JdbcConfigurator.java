@@ -1,97 +1,67 @@
 package com.github.perscholas;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.sql.*;
 //import com.mysql.cj.jdbc.Driver;
 import java.util.StringJoiner;
 
 public class JdbcConfigurator {
+    private static final EntityManagerFactory emFactoryObj;
+    private static final String PERSISTENCE_UNIT_NAME = "SBA";
+
+    static {
+        emFactoryObj = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    }
+
+    // This Method Is Used To Retrieve The 'EntityManager' Object
+    public static EntityManager getEntityManager() {
+        return emFactoryObj.createEntityManager();
+    }
+
     public static void initialize() {
-        //registerJDBCDriver();
-        Connection mariaDbConnection = getConnection("mariadb");
+        EntityManager entityMgr = getEntityManager();
+        entityMgr.getTransaction().begin();
+        entityMgr.createNativeQuery("use sbaweek8").executeUpdate();
 
-        executeStatement(mariaDbConnection, "DROP DATABASE IF EXISTS sba;");
-        executeStatement(mariaDbConnection, "CREATE DATABASE IF NOT EXISTS sba;");
-        executeStatement(mariaDbConnection, "USE sba;");
-        executeStatement(mariaDbConnection, new StringBuilder()
-                .append("CREATE TABLE IF NOT EXISTS sba.pokemonTable(")
-                .append("id int auto_increment primary key,")
-                .append("name text not null,")
-                .append("primary_type int not null,")
-                .append("secondary_type int null);").toString());
+        entityMgr.createNativeQuery("CREATE TABLE if not exists `course` (`id` INT(11) NOT NULL,`name` VARCHAR(50) NOT NULL,`instructor` VARCHAR(50) NOT NULL, PRIMARY KEY (`id`));").executeUpdate();
+        entityMgr.createNativeQuery("CREATE TABLE if not exists `student` (`email` varchar(50) NOT NULL,`name` VARCHAR(50) NOT NULL,`password` VARCHAR(50) NOT NULL, PRIMARY KEY (`email`));").executeUpdate();
+        entityMgr.createNativeQuery("CREATE TABLE if not exists `studentcourse` (\n" +
+                "\t`courseid` INT(11) NOT NULL,\n" +
+                "\t`studentemail` VARCHAR(50) NOT NULL,\n" +
+                "\tPRIMARY KEY (`courseid`, `studentemail`),\n" +
+                "\tINDEX `studentemail` (`studentemail`),\n" +
+                "\tCONSTRAINT `studentcourse_ibfk_1` FOREIGN KEY (`studentemail`) REFERENCES `student` (`email`) ON DELETE CASCADE,\n" +
+                "\tCONSTRAINT `studentcourse_ibfk_2` FOREIGN KEY (`courseid`) REFERENCES `course` (`id`) ON DELETE CASCADE\n" +
+                ");").executeUpdate();
 
-        executeStatement(mariaDbConnection, new StringBuilder()
-                .append("INSERT INTO sba.pokemonTable ")
-                .append("(id, name, primary_type, secondary_type)")
-                .append(" VALUES (12, 'Ivysaur', 3, 7);").toString());
+        entityMgr.createNativeQuery("insert into student (email, name, password) values ('hluckham0@google.ru', 'Hazel Luckham', 'X1uZcoIh0dj');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('sbowden1@yellowbook.com', 'Sonnnie Bowden', 'SJc4aWSU');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('qllorens2@howstuffworks.com', 'Quillan Llorens', 'W6rJuxd');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('cstartin3@flickr.com', 'Clem Startin', 'XYHzJ1S');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('tattwool4@biglobe.ne.jp', 'Thornie Attwool', 'Hjt0SoVmuBz');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('hguerre5@deviantart.com', 'Harcourt Guerre', 'OzcxzD1PGs');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('htaffley6@columbia.edu', 'Holmes Taffley', 'xowtOQ');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('aiannitti7@is.gd', 'Alexandra Iannitti', 'TWP4hf5j');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('ljiroudek8@sitemeter.com', 'Laryssa Jiroudek', 'bXRoLUP');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Student (email, name, password) values ('cjaulme9@bing.com', 'Cahra Jaulme', 'FnVklVgC6r6');").executeUpdate();
 
-        String query = "SELECT * FROM sba.pokemonTable;";
-        ResultSet resultSet = executeQuery(mariaDbConnection, query);
-        printResults(resultSet);
+        entityMgr.createNativeQuery("insert  into Course (id, name, instructor) values (1, 'English', 'Anderea Scamaden');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (2, 'Mathematics', 'Eustace Niemetz');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (3, 'Anatomy', 'Reynolds Pastor');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (4, 'Organic Chemistry', 'Odessa Belcher');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (5, 'Physics', 'Dani Swallow');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (6, 'Digital Logic', 'Glenden Reilingen');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (7, 'Object Oriented Programming','Giselle Ardy');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (8, 'Data Structures', 'Carolan Stoller');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (9, 'Politics', 'Carmita De Maine');").executeUpdate();
+        entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (10, 'Art', 'Kingsly Doxsey');").executeUpdate();
+
+        entityMgr.getTransaction().commit();
+        entityMgr.clear();
+
     }
 
-    static void registerJDBCDriver() {
-        // Attempt to register JDBC Driver
-        try {
-            DriverManager.registerDriver(Driver.class.newInstance());
-        } catch (InstantiationException | IllegalAccessException | SQLException e1) {
-            throw new Error(e1);
-        }
-    }
 
-    public static Connection getConnection(String dbVendor) {
-        String username = "root";
-        String password = "root";
-        String url = "jdbc:" + dbVendor + "://127.0.0.1/";
-        try {
-            return DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            throw new Error(e);
-        }
-    }
-
-    public static Statement getScrollableStatement(Connection connection) {
-        int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
-        int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
-        try {
-            return connection.createStatement(resultSetType, resultSetConcurrency);
-        } catch (SQLException e) {
-            throw new Error(e);
-        }
-    }
-
-    public static void printResults(ResultSet resultSet) {
-        try {
-            for (Integer rowNumber = 0; resultSet.next(); rowNumber++) {
-                String firstColumnData = resultSet.getString(1);
-                String secondColumnData = resultSet.getString(2);
-                String thirdColumnData = resultSet.getString(3);
-                System.out.println(new StringJoiner("\n")
-                        .add("Row number = " + rowNumber.toString())
-                        .add("First Column = " + firstColumnData)
-                        .add("Second Column = " + secondColumnData)
-                        .add("Third column = " + thirdColumnData)
-                        .toString());
-            }
-        } catch (SQLException e) {
-            throw new Error(e);
-        }
-    }
-
-    static void executeStatement(Connection connection, String sqlStatement) {
-        try {
-            Statement statement = getScrollableStatement(connection);
-            statement.execute(sqlStatement);
-        } catch (SQLException e) {
-            throw new Error(e);
-        }
-    }
-
-    static ResultSet executeQuery(Connection connection, String sqlQuery) {
-        try {
-            Statement statement = getScrollableStatement(connection);
-            return statement.executeQuery(sqlQuery);
-        } catch (SQLException e) {
-            throw new Error(e);
-        }
-    }
 }

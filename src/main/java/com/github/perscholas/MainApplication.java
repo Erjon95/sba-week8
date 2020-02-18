@@ -8,7 +8,7 @@ import javax.persistence.Persistence;
 
 public class MainApplication {
 
-    private static final EntityManagerFactory emFactoryObj;
+    /*private static final EntityManagerFactory emFactoryObj;
     private static final String PERSISTENCE_UNIT_NAME = "SBA";
 
     static {
@@ -18,15 +18,23 @@ public class MainApplication {
     // This Method Is Used To Retrieve The 'EntityManager' Object
     public static EntityManager getEntityManager() {
         return emFactoryObj.createEntityManager();
-    }
+    }*/
     public static void main(String[] args) {
-        //JdbcConfigurator.initialize();
+        //Persistence.generateSchema("SBA", null);
+        JdbcConfigurator.initialize();
         //Runnable sms = new SchoolManagementSystem();
         //sms.run();
-        EntityManager entityMgr = getEntityManager();
-        entityMgr.getTransaction().begin();
+        //EntityManager entityMgr = getEntityManager();
+        //entityMgr.getTransaction().begin();
+        //entityMgr.createNativeQuery("use sbaweek8").executeUpdate();
+        //entityMgr.createNativeQuery("CREATE TABLE `course` (`id` INT(11) NOT NULL,`name` VARCHAR(50) NOT NULL,`instructor` VARCHAR(50) NOT NULL, PRIMARY KEY (`id`));").executeUpdate();
+        //entityMgr.getTransaction().commit();
+        //entityMgr.clear();
+        //entityMgr.getTransaction().commit();
 
-        Course course = new Course();
+        //entityMgr.clear();
+
+        /*Course course = new Course();
         course.setId(102);
         course.setName("Physics");
         course.setInstructor("Frank Drebin");
@@ -35,6 +43,6 @@ public class MainApplication {
         entityMgr.getTransaction().commit();
 
         entityMgr.clear();
-        System.out.println("Record Successfully Inserted In The Database");
+        System.out.println("Record Successfully Inserted In The Database");*/
     }
 }
