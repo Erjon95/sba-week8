@@ -22,8 +22,9 @@ public class MainApplication {
     public static void main(String[] args) {
         //Persistence.generateSchema("SBA", null);
         JdbcConfigurator.initialize();
-        //Runnable sms = new SchoolManagementSystem();
-        //sms.run();
+        Runnable sms = new SchoolManagementSystem(JdbcConfigurator.entityMgr);
+        sms.run();
+        JdbcConfigurator.entityMgr.clear();
         //EntityManager entityMgr = getEntityManager();
         //entityMgr.getTransaction().begin();
         //entityMgr.createNativeQuery("use sbaweek8").executeUpdate();

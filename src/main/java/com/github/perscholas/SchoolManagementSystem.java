@@ -2,45 +2,36 @@ package com.github.perscholas;
 
 import com.github.perscholas.dao.CourseDao;
 import com.github.perscholas.dao.StudentDao;
-import com.github.perscholas.model.CourseInterface;
+import com.github.perscholas.service.CourseService;
+import com.github.perscholas.service.StudentService;
 import com.github.perscholas.utils.IOConsole;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.EntityManager;
 
 public class SchoolManagementSystem implements Runnable {
     private static final IOConsole console = new IOConsole();
+    private EntityManager entityManager;
+
+    public SchoolManagementSystem(EntityManager entityManager)
+    {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public void run() {
         String smsDashboardInput = getSchoolManagementSystemDashboardInput();
-        CourseDao courseDao = null;
         if ("login".equals(smsDashboardInput)) {
-
-            try {
-                List<CourseInterface> list = courseDao.getAllCourses();
-            }catch (NullPointerException e)
-            {
-                if (courseDao == null)
-                    System.out.println("coursedao is null");
-            }
-
-            /*for (int i = 0; i < list.size(); i++)
-                System.out.println(list.get(i).getName());*/
-
-
-            /*StudentDao studentService = null; // TODO - get literal value
+            StudentDao studentService = new StudentService();
             String studentEmail = console.getStringInput("Enter your email:");
             String studentPassword = console.getStringInput("Enter your password:");
-            Boolean isValidLogin = studentService.validateStudent(studentEmail, studentPassword);
+            Boolean isValidLogin = studentService.validateStudent(studentEmail, studentPassword, entityManager);
             if (isValidLogin) {
-                String studentDashboardInput = getStudentDashboardInput();
+                String studentDashboardInput = getStudentDashboardInput(studentEmail);
                 if ("register".equals(studentDashboardInput)) {
                     Integer courseId = getCourseRegistryInput();
-                    studentService.registerStudentToCourse(studentEmail, courseId);
+                    studentService.registerStudentToCourse(studentEmail, courseId, entityManager);
                 }
-            }*/
+            }
         }
     }
 
@@ -52,9 +43,12 @@ public class SchoolManagementSystem implements Runnable {
                 .toString());
     }
 
-    private String getStudentDashboardInput() {
+    private String getStudentDashboardInput(String studentEmail) {
+        StudentDao studentService = new StudentService();
         return console.getStringInput(new StringBuilder()
                 .append("Welcome to the Student Dashboard!")
+                .append("\nCourses you are registered to:")
+                .append("\n" + studentService.getStudentCourses(studentEmail, entityManager).toString())
                 .append("\nFrom here, you can select any of the following options:")
                 .append("\n\t[ register ], [ logout]")
                 .toString());
@@ -62,11 +56,13 @@ public class SchoolManagementSystem implements Runnable {
 
 
     private Integer getCourseRegistryInput() {
-        List<Integer> listOfCoursesIds = new ArrayList<>();
+        CourseDao courseService = new CourseService();
+        courseService.getAllCourses(entityManager);
         return console.getIntegerInput(new StringBuilder()
                 .append("Welcome to the Course Registration Dashboard!")
                 .append("\nFrom here, you can select any of the following options:")
-                .append("\n\t" + listOfCoursesIds.toString())
+                .append("\n\n" + courseService.toString())
                 .toString());
     }
+
 }
