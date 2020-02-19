@@ -1,11 +1,19 @@
 package com.github.perscholas;
 
+import com.github.perscholas.model.StudentCourse;
+import com.github.perscholas.model.StudentCourseInterface;
+import com.github.perscholas.model.StudentInterface;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.metamodel.Metamodel;
 import java.sql.*;
 //import com.mysql.cj.jdbc.Driver;
+import java.util.List;
 import java.util.StringJoiner;
+
 
 public class JdbcConfigurator {
     private static final EntityManagerFactory emFactoryObj;
@@ -21,15 +29,16 @@ public class JdbcConfigurator {
         return emFactoryObj.createEntityManager();
     }
 
-    public static void initialize() {
+    public static void useDB()
+    {
         entityMgr = getEntityManager();
         entityMgr.getTransaction().begin();
         entityMgr.createNativeQuery("use sbaweek8").executeUpdate();
+        entityMgr.getTransaction().commit();
+    }
 
-       /* entityMgr.createNativeQuery("drop table if exists studentcourse;").executeUpdate();
-        entityMgr.createNativeQuery("drop table if exists student;").executeUpdate();
-        entityMgr.createNativeQuery("drop table if exists course;").executeUpdate();*/
-
+    public static void initialize()
+    {
         entityMgr.createNativeQuery("CREATE TABLE if not exists `course` (`id` INT(11) NOT NULL,`name` VARCHAR(50) NOT NULL,`instructor` VARCHAR(50) NOT NULL, PRIMARY KEY (`id`));").executeUpdate();
         entityMgr.createNativeQuery("CREATE TABLE if not exists `student` (`email` varchar(50) NOT NULL,`name` VARCHAR(50) NOT NULL,`password` VARCHAR(50) NOT NULL, PRIMARY KEY (`email`));").executeUpdate();
         entityMgr.createNativeQuery("CREATE TABLE if not exists `studentcourse` (\n" +
@@ -40,8 +49,6 @@ public class JdbcConfigurator {
                 "\tCONSTRAINT `studentcourse_ibfk_1` FOREIGN KEY (`studentemail`) REFERENCES `student` (`email`) ON DELETE CASCADE,\n" +
                 "\tCONSTRAINT `studentcourse_ibfk_2` FOREIGN KEY (`courseid`) REFERENCES `course` (`id`) ON DELETE CASCADE\n" +
                 ");").executeUpdate();
-
-        try {
 
 
             entityMgr.createNativeQuery("insert into student (email, name, password) values ('hluckham0@google.ru', 'Hazel Luckham', 'X1uZcoIh0dj');").executeUpdate();
@@ -65,15 +72,27 @@ public class JdbcConfigurator {
             entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (8, 'Data Structures', 'Carolan Stoller');").executeUpdate();
             entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (9, 'Politics', 'Carmita De Maine');").executeUpdate();
             entityMgr.createNativeQuery("insert into Course (id, name, instructor) values (10, 'Art', 'Kingsly Doxsey');").executeUpdate();
-
-            entityMgr.getTransaction().commit();
-        }catch (javax.persistence.PersistenceException | org.hibernate.exception.ConstraintViolationException e)
-        {
-            System.out.println();
-        }
-        //entityMgr.clear();
-
     }
 
+    public static void test() {
 
+        try {
+            List<StudentInterface> list = entityMgr.createNativeQuery("select * from student").getResultList();
+        }catch (javax.persistence.PersistenceException e)
+        {
+            System.out.println("Persistence Exception");
+            entityMgr.getTransaction().begin();
+            initialize();
+            entityMgr.getTransaction().commit();
+        }
+        return;
+    }
+
+    public static void insert(int courseId, String studentEmail)
+    {
+        StudentCourseInterface studentCourseInterface = new StudentCourse(courseId, studentEmail);
+        entityMgr.getTransaction().begin();
+        entityMgr.persist(studentCourseInterface);
+        entityMgr.getTransaction().commit();
+    }
 }

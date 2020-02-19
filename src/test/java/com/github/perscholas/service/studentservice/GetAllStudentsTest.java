@@ -33,7 +33,7 @@ public class GetAllStudentsTest {
     // given
     // TODO - Add `@Test` annotation
     public void test() {
-        JdbcConfigurator.initialize();
+        //JdbcConfigurator.initialize();
         StudentDao service = (StudentDao) new StudentService();
 
         // when

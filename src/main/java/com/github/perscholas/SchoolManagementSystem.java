@@ -29,7 +29,7 @@ public class SchoolManagementSystem implements Runnable {
                 String studentDashboardInput = getStudentDashboardInput(studentEmail);
                 if ("register".equals(studentDashboardInput)) {
                     Integer courseId = getCourseRegistryInput();
-                    studentService.registerStudentToCourse(studentEmail, courseId, entityManager);
+                    studentService.registerStudentToCourse(studentEmail, courseId);
                 }
             }
         }
@@ -45,10 +45,11 @@ public class SchoolManagementSystem implements Runnable {
 
     private String getStudentDashboardInput(String studentEmail) {
         StudentDao studentService = new StudentService();
+        studentService.getStudentCourses(studentEmail, entityManager);
         return console.getStringInput(new StringBuilder()
                 .append("Welcome to the Student Dashboard!")
                 .append("\nCourses you are registered to:")
-                .append("\n" + studentService.getStudentCourses(studentEmail, entityManager).toString())
+                .append("\n" + studentService.toString())
                 .append("\nFrom here, you can select any of the following options:")
                 .append("\n\t[ register ], [ logout]")
                 .toString());

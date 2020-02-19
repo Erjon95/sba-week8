@@ -23,9 +23,6 @@ public class CourseService implements CourseDao {
 
     @Override
     public void getAllCourses(EntityManager entityManager) {
-        
-        //entityManager.getTransaction().begin();
-        //entityManager.createNativeQuery("use sbaweek8").executeUpdate();
         TypedQuery<CourseInterface> query = entityManager.createQuery("select c from Course c", CourseInterface.class);
         list = query.getResultList();
     }

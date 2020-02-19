@@ -28,7 +28,7 @@ public class GetAllCoursesTest {
 
     // given
     private void test() {
-        JdbcConfigurator.initialize();
+        //JdbcConfigurator.initialize();
 
         // when
         // TODO - define `when` clause

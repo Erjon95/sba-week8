@@ -3,20 +3,21 @@ package com.github.perscholas.service;
 import com.github.perscholas.JdbcConfigurator;
 import com.github.perscholas.dao.StudentDao;
 import com.github.perscholas.model.CourseInterface;
-import com.github.perscholas.model.StudentCourse;
-import com.github.perscholas.model.StudentCourseInterface;
 import com.github.perscholas.model.StudentInterface;
-import org.springframework.data.jpa.repository.Modifying;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
+
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 // TODO - Implement respective DAO interface
 public class StudentService implements StudentDao {
+    private List <CourseInterface> listOfCourses;
+
+    public StudentService()
+    {
+        listOfCourses = new ArrayList<>();
+    }
 
     @Override
     public List<StudentInterface> getAllStudents() {
@@ -46,23 +47,22 @@ public class StudentService implements StudentDao {
     }
 
     @Override
-    @Transactional
-    @Modifying
-    public void registerStudentToCourse(String studentEmail, int courseId, EntityManager entityManager) {
-
-        StudentCourseInterface studentCourseInterface = new StudentCourse(courseId, studentEmail);
-
-        entityManager.createNativeQuery("insert into studentcourse (courseid, studentemail) values(?1, ?2);")
-        .setParameter(1, courseId).setParameter(2, studentEmail).executeUpdate();
-
-        entityManager.getTransaction().commit();
-        //entityManager.persist(studentCourseInterface);
+    public void registerStudentToCourse(String studentEmail, int courseId){
+        JdbcConfigurator.insert(courseId, studentEmail);
     }
 
     @Override
     public List<CourseInterface> getStudentCourses(String studentEmail, EntityManager entityManager) {
+        Query query = entityManager.createNativeQuery("select c.id, c.name, c.instructor from Course c join StudentCourse sc on c.id = sc.courseId join Student s on sc.studentEmail = s.email where s.email = ?1");
+        listOfCourses = query.setParameter(1, studentEmail).getResultList();
+        return listOfCourses;
+    }
 
-        Query query = entityManager.createNativeQuery("select c.id, c.name, c.instructor from course c join studentcourse sc on c.id = sc.courseid join student s on sc.studentemail = s.email where sc.studentemail = ?1");
-        return query.setParameter(1, studentEmail).getResultList();
+    @Override
+    public String toString() {
+        String result = "";
+        for(CourseInterface courseInterface: listOfCourses)
+            result += courseInterface.getId().toString() + " " + courseInterface.getName() + " " + courseInterface.getInstructor() + "\n";
+        return result;
     }
 }

@@ -29,7 +29,7 @@ public class RegisterStudentToCourseTest {
     // given
     // TODO - Add `@Test` annotation
     public void test() {
-        JdbcConfigurator.initialize();
+        //JdbcConfigurator.initialize();
 
         // when
         // TODO - define `when` clause
