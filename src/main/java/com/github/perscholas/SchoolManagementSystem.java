@@ -49,7 +49,7 @@ public class SchoolManagementSystem implements Runnable {
         return console.getStringInput(new StringBuilder()
                 .append("Welcome to the Student Dashboard!")
                 .append("\nCourses you are registered to:")
-                .append("\n" + studentService.toString())
+                .append("\n\n" + studentService.toString())
                 .append("\nFrom here, you can select any of the following options:")
                 .append("\n\t[ register ], [ logout]")
                 .toString());

@@ -53,8 +53,9 @@ public class StudentService implements StudentDao {
 
     @Override
     public List<CourseInterface> getStudentCourses(String studentEmail, EntityManager entityManager) {
-        Query query = entityManager.createNativeQuery("select c.id, c.name, c.instructor from Course c join StudentCourse sc on c.id = sc.courseId join Student s on sc.studentEmail = s.email where s.email = ?1");
-        listOfCourses = query.setParameter(1, studentEmail).getResultList();
+        listOfCourses = entityManager.createQuery("select c from StudentCourse sc, Course c, Student s where sc.courseId = c.id and sc.studentEmail = s.email and s.email = ?1", CourseInterface.class)
+                .setParameter(1, studentEmail)
+                .getResultList();
         return listOfCourses;
     }
 
