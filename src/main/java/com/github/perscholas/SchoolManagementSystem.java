@@ -2,6 +2,7 @@ package com.github.perscholas;
 
 import com.github.perscholas.dao.CourseDao;
 import com.github.perscholas.dao.StudentDao;
+import com.github.perscholas.model.StudentInterface;
 import com.github.perscholas.service.CourseService;
 import com.github.perscholas.service.StudentService;
 import com.github.perscholas.utils.IOConsole;
@@ -52,9 +53,10 @@ public class SchoolManagementSystem implements Runnable {
     private String getStudentDashboardInput(String studentEmail) {
         StudentDao studentService = new StudentService();
         studentService.getStudentCourses(studentEmail, entityManager);
+        StudentInterface studentInterface = studentService.getStudentByEmail(studentEmail, entityManager);
         return console.getStringInput(new StringBuilder()
                 .append("\nWelcome to the Student Dashboard!")
-                .append("\nCourses you are registered to:")
+                .append("\nCourses " + studentInterface.getName() + " is registered to:")
                 .append("\n\n" + studentService.toString())
                 .append("\nFrom here, you can select any of the following options:")
                 .append("\n\t[ register ], [ logout]")

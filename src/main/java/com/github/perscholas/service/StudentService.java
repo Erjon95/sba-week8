@@ -25,8 +25,11 @@ public class StudentService implements StudentDao {
     }
 
     @Override
-    public StudentInterface getStudentByEmail(String studentEmail) {
-        return null;
+    public StudentInterface getStudentByEmail(String studentEmail, EntityManager entityManager) {
+         return entityManager.createQuery("select s from Student s where s.email = ?1", StudentInterface.class)
+                .setParameter(1, studentEmail)
+                .getSingleResult();
+
     }
 
     @Override
@@ -83,6 +86,7 @@ public class StudentService implements StudentDao {
     public String toString() {
         String result = "";
         for(CourseInterface courseInterface: listOfCourses)
+
             result += courseInterface.getId().toString() + " " + courseInterface.getName() + " " + courseInterface.getInstructor() + "\n";
         return result;
     }
