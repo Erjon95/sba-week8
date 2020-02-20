@@ -1,0 +1,4 @@
+This program uses MariaDB at port 3306. The configuration is done at the persistence.xml file. Other configurations,
+such as the username and password of the database user, can be adjusted at the persistence.xml file.
+
+The program autogenerates and populates the database if it does not already exists.
