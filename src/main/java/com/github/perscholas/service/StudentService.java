@@ -42,13 +42,33 @@ public class StudentService implements StudentDao {
         }catch (NoResultException nre)
         {
             result = false;
+            System.out.println("Wrong credentials");
         }
         return result;
     }
 
     @Override
-    public void registerStudentToCourse(String studentEmail, int courseId){
-        JdbcConfigurator.insert(courseId, studentEmail);
+    public void registerStudentToCourse(String studentEmail, int courseId, EntityManager entityManager){
+        int max = (int)entityManager.createNativeQuery("select max(id) from course;").getSingleResult();
+        int min = (int)entityManager.createNativeQuery("select min(id) from course;").getSingleResult();
+
+        if (courseId > max || courseId < min) {
+            System.out.println("That course does not exists! ");
+            return;
+        }
+
+        try {
+            entityManager.createNativeQuery("select * from studentcourse where courseid = ?1 and studentemail = ?2")
+                    .setParameter(1, courseId)
+                    .setParameter(2, studentEmail)
+                    .getSingleResult();
+        }catch (NoResultException nre)
+        {
+            JdbcConfigurator.insert(courseId, studentEmail);
+            System.out.println("Registration successful");
+            return;
+        }
+        System.out.println("You are already registered for that course.");
     }
 
     @Override

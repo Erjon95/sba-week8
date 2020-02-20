@@ -69,7 +69,7 @@ public class JdbcConfigurator {
 
         try {
             List<StudentInterface> list = entityMgr.createNativeQuery("select * from student").getResultList();
-        }catch (javax.persistence.PersistenceException | Error e)
+        }catch (javax.persistence.PersistenceException e)
         {
             String filePopulateCourses ="src/main/resources/courses.populate-table.sql";
             String filePopulateStudents ="src/main/resources/students.populate-table.sql";
