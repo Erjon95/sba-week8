@@ -25,6 +25,7 @@ public class CourseService implements CourseDao {
     public void getAllCourses(EntityManager entityManager) {
         TypedQuery<CourseInterface> query = entityManager.createQuery("select c from Course c", CourseInterface.class);
         list = query.getResultList();
+
     }
 
     @Override
